@@ -5,33 +5,38 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.view.ViewGroup
-
+import kotlin.properties.Delegates
 
 class PipeView(context: Context) : ViewGroup(context) {
-  var painter: Paint
-  val xSide = 100f
-  val ySide = 10f
-  val sideLength = 300f
+  var painter: Paint by Delegates.notNull()
+  val strokeWidth = 10f
+  val paintColor = Color.RED
 
-  init {
+  var width = 0.0f
+  var height = 0.0f
+  var distanceX = 0.0f
+  var distanceY = 0.0f
+
+  constructor(context: Context,distanceX: Float, distanceY: Float, width: Float,
+      height: Float) : this(context) {
     setWillNotDraw(false)
 
     painter = Paint(Paint.ANTI_ALIAS_FLAG)
-    painter.color = Color.RED
-    painter.strokeWidth = 10f
+    painter.color = paintColor
+    painter.strokeWidth = strokeWidth
     painter.style = Paint.Style.FILL
+
+    this.distanceX = distanceX
+    this.distanceY = distanceY
+    this.width = width
+    this.height = height
   }
 
   override fun onLayout(p0: Boolean, p1: Int, p2: Int, p3: Int, p4: Int) {
   }
 
-  override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-    super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-  }
-
-
   override fun onDraw(canvas: Canvas?) {
     super.onDraw(canvas)
-    canvas?.drawRect(0f, 0f, 50f, 600f, painter)
+    canvas?.drawRect(distanceX, distanceY, width, height, painter)
   }
 }
