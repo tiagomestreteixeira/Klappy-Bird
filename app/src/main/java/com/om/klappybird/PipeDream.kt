@@ -7,18 +7,22 @@ import android.graphics.Paint
 import android.view.ViewGroup
 import kotlin.properties.Delegates
 
-class PipeView(context: Context) : ViewGroup(context) {
+class PipeDream(context: Context) : ViewGroup(context) {
   var painter: Paint by Delegates.notNull()
   val strokeWidth = 10f
   val paintColor = Color.RED
 
-  var width = 0.0f
-  var height = 0.0f
-  var distanceX = 0.0f
-  var distanceY = 0.0f
+  var pipes: ArrayList<Pipe> by Delegates.notNull()
 
-  constructor(context: Context,distanceX: Float, distanceY: Float, width: Float,
-      height: Float) : this(context) {
+  var distanceX = 20
+  var distanceY = 50
+  var rectWidth = 50
+  var rectHeight = 600
+
+  var widthPadding = 0
+  var distancePadding = 0
+
+  init {
     setWillNotDraw(false)
 
     painter = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -26,10 +30,13 @@ class PipeView(context: Context) : ViewGroup(context) {
     painter.strokeWidth = strokeWidth
     painter.style = Paint.Style.FILL
 
-    this.distanceX = distanceX
-    this.distanceY = distanceY
-    this.width = width
-    this.height = height
+    pipes = ArrayList<Pipe>()
+
+    for (i in 0..5) {
+      pipes.add(Pipe(distanceX + distancePadding, distanceY, rectWidth + widthPadding, rectHeight))
+      distancePadding += 100
+      widthPadding += 100
+    }
   }
 
   override fun onLayout(p0: Boolean, p1: Int, p2: Int, p3: Int, p4: Int) {
@@ -37,6 +44,10 @@ class PipeView(context: Context) : ViewGroup(context) {
 
   override fun onDraw(canvas: Canvas?) {
     super.onDraw(canvas)
-    canvas?.drawRect(distanceX, distanceY, width, height, painter)
+
+    pipes.forEach {
+      canvas?.drawRect(it.distanceX.toFloat(), it.distanceY.toFloat(), it.width.toFloat(),
+          it.height.toFloat(), painter)
+    }
   }
 }
