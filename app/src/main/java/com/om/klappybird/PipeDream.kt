@@ -8,9 +8,9 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.util.DisplayMetrics
 import android.view.View
+//import android.view.View
 import android.view.WindowManager
 import java.util.*
-import java.util.concurrent.ThreadLocalRandom
 
 class PipeDream(context: Context) : View(context) {
   val painter: Paint
@@ -54,7 +54,7 @@ class PipeDream(context: Context) : View(context) {
         (screenDimensions.heightPixels / 3) + birdRelativePosition)
 
     for (i in 0..100) {
-      pipeHeight = ThreadLocalRandom.current().nextInt(300, 500 + 1)
+      pipeHeight = Random().nextInt(500 - 300) + 300
 
       if (i % 2 == 0) {
         pipes.add(Rect(distanceX + pipeDistanceXpadding, distanceY, pipeWidth + pipeWidthPadding,
@@ -89,5 +89,17 @@ class PipeDream(context: Context) : View(context) {
     wm.defaultDisplay.getMetrics(displayMetrics)
 
     return displayMetrics
+  }
+
+  fun animatePipes(){
+    val sleepTime = 1000L / 60L
+
+    pipes.forEach {
+      it.right--
+      it.left--
+//      invalidate()
+
+      Thread.sleep(sleepTime)
+    }
   }
 }

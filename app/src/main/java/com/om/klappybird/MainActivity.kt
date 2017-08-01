@@ -13,5 +13,9 @@ class MainActivity : AppCompatActivity() {
     val pipedream = PipeDream(this)
 
     mainContentView.addView(pipedream)
+
+    while (true) {
+      pipedream.animatePipes()
+    }
   }
 }
