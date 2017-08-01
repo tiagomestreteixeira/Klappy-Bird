@@ -8,8 +8,8 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.util.DisplayMetrics
 import android.view.View
-//import android.view.View
 import android.view.WindowManager
+import timber.log.Timber
 import java.util.*
 
 class PipeDream(context: Context) : View(context) {
@@ -21,9 +21,9 @@ class PipeDream(context: Context) : View(context) {
 
   val bird: Rect
 
-  val distanceX = 20
+  val distanceX = 300
   val distanceY = 0
-  val pipeWidth = 50
+  val pipeWidth = 320
 
   var pipeHeight = 300
   var pipeWidthPadding = 0
@@ -34,6 +34,13 @@ class PipeDream(context: Context) : View(context) {
   val birdRelativePosition = 50
   val birdDistanceX = 50
   val birdWidth = 100
+
+  var positionX = 100.0
+  var positionY = 175.0
+  var velocityX = 4.0
+  var velocityY = 0.0
+  var gravity = 0.5
+  var onGround = false
 
   /**
    * Equivalent of a property initializer for all properties that are mentioned within
@@ -91,15 +98,45 @@ class PipeDream(context: Context) : View(context) {
     return displayMetrics
   }
 
-  fun animatePipes(){
-    val sleepTime = 1000L / 60L
+  fun loop() {
+    updateBird()
+//    render()
+    Timber.d("We're looping")
+  }
 
-    pipes.forEach {
-      it.right--
-      it.left--
-//      invalidate()
+  fun render() {
+    bird.bottom += 10
+    bird.top += 10
+    invalidate()
+    Timber.d("Rendering")
+  }
 
-      Thread.sleep(sleepTime)
+  fun updateBird() {
+    Timber.d("Updating")
+    velocityY += gravity
+    positionY += velocityY
+    positionX += velocityX
+
+    if (positionY > 175.0) {
+      positionY = 175.0
+      velocityY = 0.0
+      onGround = true
+    }
+
+    if (positionX < 10 || positionX > 190)
+      velocityX *= -1
+  }
+
+  fun startJump() {
+    if (onGround) {
+      velocityY = -12.0
+      onGround = false
+    }
+  }
+
+  fun endJump() {
+    if (velocityY < -6.0) {
+      velocityY = -6.0
     }
   }
 }
