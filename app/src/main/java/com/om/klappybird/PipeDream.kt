@@ -1,49 +1,43 @@
 package com.om.klappybird
 
-import android.app.Activity
 import android.content.Context
 import android.content.Context.WINDOW_SERVICE
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Rect
 import android.util.DisplayMetrics
-import android.view.ViewGroup
+import android.view.View
 import android.view.WindowManager
+import java.util.*
 import java.util.concurrent.ThreadLocalRandom
-import kotlin.properties.Delegates
 
-data class Pipe(val distanceX: Float, val distanceY: Float, val width: Float, val height: Float)
-
-//data class Bird(val distanceX: Float, val distanceY: Float, val width: Float, val height: Float)
-
-class ScreenDimens(val width: Int, val height: Int) {
-  operator fun component1() = width
-  operator fun component2() = height
-}
-
-class PipeDream(context: Context) : ViewGroup(context) {
-  var painter: Paint by Delegates.notNull()
+class PipeDream(context: Context) : View(context) {
+  val painter: Paint
   val strokeWidth = 10f
   val paintColor = Color.RED
 
-  var pipes: MutableList<Pipe> by Delegates.notNull()
+  val pipes: MutableList<Rect>
 
-  var bird: Pipe by Delegates.notNull()
+  val bird: Rect
 
-  var distanceX = 20f
-  var distanceY = 0f
-  var pipeWidth = 50f
-  var pipeHeight = 300f
+  val distanceX = 20
+  val distanceY = 0
+  val pipeWidth = 50
+
+  var pipeHeight = 300
   var pipeWidthPadding = 0
   var pipeDistanceXpadding = 0
 
-  var screenWidth = 0
-  var screenHeight = 0
+  val screenDimensions: DisplayMetrics
 
-  var birdRelativePosition = 50f
-  var birdDistanceX = 50f
-  var birdWidth = 100f
+  val birdRelativePosition = 50
+  val birdDistanceX = 50
+  val birdWidth = 100
 
+  /**
+   * Equivalent of a property initializer for all properties that are mentioned within
+   */
   init {
     setWillNotDraw(false)
 
@@ -52,24 +46,23 @@ class PipeDream(context: Context) : ViewGroup(context) {
     painter.strokeWidth = strokeWidth
     painter.style = Paint.Style.FILL
 
-    screenWidth = getScreenDimens().component1()
-    screenWidth = getScreenDimens().component2()
+    screenDimensions = getScreenDimens()
 
-    pipes = ArrayList<Pipe>()
+    pipes = ArrayList<Rect>()
 
-    bird = Pipe(birdDistanceX, (screenHeight / 3).toFloat(), birdWidth,
-        (screenHeight / 3).toFloat() + birdRelativePosition)
+    bird = Rect(birdDistanceX, (screenDimensions.heightPixels / 3), birdWidth,
+        (screenDimensions.heightPixels / 3) + birdRelativePosition)
 
     for (i in 0..100) {
-      pipeHeight = ThreadLocalRandom.current().nextInt(300, 500 + 1).toFloat()
+      pipeHeight = ThreadLocalRandom.current().nextInt(300, 500 + 1)
 
       if (i % 2 == 0) {
-        pipes.add(Pipe(distanceX + pipeDistanceXpadding, distanceY, pipeWidth + pipeWidthPadding,
+        pipes.add(Rect(distanceX + pipeDistanceXpadding, distanceY, pipeWidth + pipeWidthPadding,
             pipeHeight))
       } else {
         pipes.add(
-            Pipe(distanceX + pipeDistanceXpadding, screenHeight.toFloat() - pipeHeight,
-                pipeWidth + pipeWidthPadding, screenHeight.toFloat()))
+            Rect(distanceX + pipeDistanceXpadding, screenDimensions.heightPixels - pipeHeight,
+                pipeWidth + pipeWidthPadding, screenDimensions.heightPixels))
       }
 
       pipeDistanceXpadding += 100
@@ -83,19 +76,18 @@ class PipeDream(context: Context) : ViewGroup(context) {
   override fun onDraw(canvas: Canvas?) {
     super.onDraw(canvas)
 
-    canvas?.drawRect(bird.distanceX, bird.distanceY, bird.width, bird.height, painter)
+    canvas?.drawRect(bird, painter)
 
     pipes.forEach {
-      canvas?.drawRect(it.distanceX, it.distanceY, it.width,
-          it.height, painter)
+      canvas?.drawRect(it, painter)
     }
   }
 
-  fun getScreenDimens(): ScreenDimens {
-    val wm = (context as Activity).getSystemService(WINDOW_SERVICE) as WindowManager
+  fun getScreenDimens(): DisplayMetrics {
+    val wm = context.getSystemService(WINDOW_SERVICE) as WindowManager
     val displayMetrics = DisplayMetrics()
     wm.defaultDisplay.getMetrics(displayMetrics)
 
-    return ScreenDimens(displayMetrics.heightPixels, displayMetrics.widthPixels)
+    return displayMetrics
   }
 }
