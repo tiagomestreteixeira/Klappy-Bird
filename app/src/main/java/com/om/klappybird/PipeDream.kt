@@ -1,23 +1,22 @@
 package com.om.klappybird
 
 import android.content.Context
-import android.content.Context.WINDOW_SERVICE
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
-import android.util.DisplayMetrics
 import android.view.View
-import android.view.WindowManager
-import timber.log.Timber
 import java.util.*
 
-class PipeDream(context: Context) : View(context) {
+class PipeDream(context: Context, screenHeight: Int) : View(context) {
+
   val painter: Paint
   val strokeWidth = 10f
   val paintColor = Color.RED
 
   val pipes: MutableList<Rect>
+
+  val screenHeight: Int
 
   val bird: Rect
 
@@ -29,17 +28,13 @@ class PipeDream(context: Context) : View(context) {
   var pipeWidthPadding = 0
   var pipeDistanceXpadding = 0
 
-  val screenDimensions: DisplayMetrics
-
   val birdRelativePosition = 50
   val birdDistanceX = 50
   val birdWidth = 100
 
-  var positionX = 100.0
-  var positionY = 175.0
-  var velocityX = 4.0
-  var velocityY = 0.0
-  var gravity = 0.5
+  var positionY = 20
+  var velocityY = 0
+  var gravity = 3
   var onGround = false
 
   /**
@@ -53,23 +48,23 @@ class PipeDream(context: Context) : View(context) {
     painter.strokeWidth = strokeWidth
     painter.style = Paint.Style.FILL
 
-    screenDimensions = getScreenDimens()
-
     pipes = ArrayList<Rect>()
 
-    bird = Rect(birdDistanceX, (screenDimensions.heightPixels / 3), birdWidth,
-        (screenDimensions.heightPixels / 3) + birdRelativePosition)
+    this.screenHeight = screenHeight
 
-    for (i in 0..100) {
-      pipeHeight = Random().nextInt(500 - 300) + 300
+    bird = Rect(birdDistanceX, screenHeight / 2, birdWidth,
+        (screenHeight / 2) + birdRelativePosition)
+
+    for (i in 0..300) {
+      pipeHeight = Random().nextInt(400 - 100) + 100
 
       if (i % 2 == 0) {
         pipes.add(Rect(distanceX + pipeDistanceXpadding, distanceY, pipeWidth + pipeWidthPadding,
             pipeHeight))
       } else {
         pipes.add(
-            Rect(distanceX + pipeDistanceXpadding, screenDimensions.heightPixels - pipeHeight,
-                pipeWidth + pipeWidthPadding, screenDimensions.heightPixels))
+            Rect(distanceX + pipeDistanceXpadding, screenHeight - pipeHeight,
+                pipeWidth + pipeWidthPadding, screenHeight))
       }
 
       pipeDistanceXpadding += 100
@@ -87,56 +82,58 @@ class PipeDream(context: Context) : View(context) {
 
     pipes.forEach {
       canvas?.drawRect(it, painter)
+
+//      if (bird.intersect(it)) {
+//
+//      }
     }
-  }
-
-  fun getScreenDimens(): DisplayMetrics {
-    val wm = context.getSystemService(WINDOW_SERVICE) as WindowManager
-    val displayMetrics = DisplayMetrics()
-    wm.defaultDisplay.getMetrics(displayMetrics)
-
-    return displayMetrics
   }
 
   fun loop() {
     updateBird()
-//    render()
-    Timber.d("We're looping")
+    render()
   }
 
   fun render() {
-    bird.bottom += 10
-    bird.top += 10
+    if (bird.bottom <= screenHeight) {
+      bird.bottom += 7
+      bird.top += 7
+    }
+
+    if (!onGround) {
+      bird.bottom -= positionY
+      bird.top -= positionY
+    }
+
+    pipes.forEach {
+      it.right -= 5
+      it.left -= 5
+    }
+
     invalidate()
-    Timber.d("Rendering")
   }
 
   fun updateBird() {
-    Timber.d("Updating")
     velocityY += gravity
     positionY += velocityY
-    positionX += velocityX
 
-    if (positionY > 175.0) {
-      positionY = 175.0
-      velocityY = 0.0
+    if (positionY > 40) {
+      positionY = 40
+      velocityY = 35
       onGround = true
     }
-
-    if (positionX < 10 || positionX > 190)
-      velocityX *= -1
   }
 
   fun startJump() {
     if (onGround) {
-      velocityY = -12.0
+      velocityY = -6
       onGround = false
     }
   }
 
   fun endJump() {
-    if (velocityY < -6.0) {
-      velocityY = -6.0
+    if (velocityY < -3) {
+      velocityY = -3
     }
   }
 }
