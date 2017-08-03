@@ -20,6 +20,10 @@ class MainActivity : AppCompatActivity() {
 
   lateinit var prefs: SharedPreferences
 
+  /**
+   * TODO: Detect collision with ceiling and floor as a loss
+   */
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
