@@ -1,22 +1,33 @@
 package com.om.klappybird
 
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.MotionEvent
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
-
 class MainActivity : AppCompatActivity() {
+
+  var score: Int = 0
+  var highScore: Int = 0
 
   lateinit var pipeDream: PipeDream
   var gameStarted = false
   var timer = Timer()
 
+  lateinit var prefs: SharedPreferences
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
+
+    prefs = PreferenceManager.getDefaultSharedPreferences(this)
+
+    highScore = prefs.getInt("HIGH_SCORE", 0)
+    highScoreTV.text = highScore.toString()
 
     mainContentView.post({
       pipeDream = PipeDream(this, mainContentView.height)
@@ -60,18 +71,35 @@ class MainActivity : AppCompatActivity() {
   fun stopGameLoop() {
     timer.cancel()
     gameStarted = false
-    mainContentView.isClickable = false
+    mainContentView.isEnabled = false
 
     AlertDialog.Builder(this)
         .setMessage("Welp! You lost. Restart?")
         .setPositiveButton("Yes",
             { dialog, which ->
+
               timer = Timer()
               pipeDream = PipeDream(this, mainContentView.height)
               mainContentView.removeAllViews()
               mainContentView.addView(pipeDream)
-              mainContentView.isClickable = false
+              scoreTV.text = "0"
+
+              mainContentView.isEnabled = true
+
             }).setNegativeButton("No",
         { dialogInterface, i -> finish() }).setCancelable(false).show()
+  }
+
+  fun incrementScore() {
+    score = Integer.parseInt(scoreTV.text.toString()) + 1
+
+    scoreTV.text = score.toString()
+
+    if (score > highScore) {
+      highScore = score
+      prefs.edit().putInt("HIGH_SCORE", highScore).apply()
+
+      highScoreTV.text = Integer.parseInt(scoreTV.text.toString()).toString()
+    }
   }
 }

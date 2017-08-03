@@ -38,7 +38,6 @@ class PipeDream(context: Context, screenHeight: Int) : View(context) {
     setWillNotDraw(false)
 
     painter = Paint(Paint.ANTI_ALIAS_FLAG)
-    painter.color = paintColor
     painter.strokeWidth = strokeWidth
     painter.style = Paint.Style.FILL
 
@@ -73,14 +72,20 @@ class PipeDream(context: Context, screenHeight: Int) : View(context) {
   override fun onDraw(canvas: Canvas?) {
     super.onDraw(canvas)
 
+    painter.color = Color.GREEN
     canvas?.drawRect(bird, painter)
 
+    painter.color = Color.RED
     pipes.forEach {
       canvas?.drawRect(it, painter)
 
       if (bird.intersect(it)) {
         canvas?.drawColor(Color.WHITE, PorterDuff.Mode.MULTIPLY)
         (context as MainActivity).stopGameLoop()
+      }
+
+      if (bird.left == it.left) {
+        (context as MainActivity).incrementScore()
       }
     }
   }
