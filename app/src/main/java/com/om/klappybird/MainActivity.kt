@@ -48,4 +48,8 @@ class MainActivity : AppCompatActivity() {
     super.onDestroy()
     timer.cancel()
   }
+
+  fun stopGameLoop() {
+    timer.cancel()
+  }
 }

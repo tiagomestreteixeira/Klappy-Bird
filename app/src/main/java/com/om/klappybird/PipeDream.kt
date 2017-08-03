@@ -1,10 +1,7 @@
 package com.om.klappybird
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import android.view.View
 import java.util.*
 
@@ -83,9 +80,10 @@ class PipeDream(context: Context, screenHeight: Int) : View(context) {
     pipes.forEach {
       canvas?.drawRect(it, painter)
 
-//      if (bird.intersect(it)) {
-//
-//      }
+      if (bird.intersect(it)) {
+        canvas?.drawColor(Color.TRANSPARENT, PorterDuff.Mode.MULTIPLY)
+        (context as MainActivity).stopGameLoop()
+      }
     }
   }
 
