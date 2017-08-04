@@ -3,17 +3,22 @@ package com.om.klappybird
 import android.content.Context
 import android.graphics.*
 import android.view.View
+import timber.log.Timber
 import java.util.*
 
 class PipeDream(context: Context, screenHeight: Int) : View(context) {
 
   val painter: Paint
   val strokeWidth = 10f
-  val paintColor = Color.RED
 
-  val pipes: MutableList<Rect>
+  var pipes: MutableList<Rect>
+  var remainingPipes: MutableList<Rect>
+
+  val drawingTimer: Timer
 
   val screenHeight: Int
+
+  var createBottomPipe = false
 
   val bird: Rect
 
@@ -41,28 +46,17 @@ class PipeDream(context: Context, screenHeight: Int) : View(context) {
     painter.strokeWidth = strokeWidth
     painter.style = Paint.Style.FILL
 
-    pipes = ArrayList<Rect>()
+    drawingTimer = Timer()
+    pipes = ArrayList()
+    remainingPipes = ArrayList()
 
     this.screenHeight = screenHeight
 
     bird = Rect(birdLeftMargin, screenHeight / 3, birdWidth,
         (screenHeight / 3) + birdHeight)
 
-    for (i in 0..300) {
-      pipeHeight = Random().nextInt(400 - 100) + 100
-
-      if (i % 2 == 0) {
-        pipes.add(
-            Rect(pipeLeftMargin + pipeDistanceXpadding, pipeTopMargin, pipeWidth + pipeWidthPadding,
-                pipeHeight))
-      } else {
-        pipes.add(
-            Rect(pipeLeftMargin + pipeDistanceXpadding, screenHeight - pipeHeight,
-                pipeWidth + pipeWidthPadding, screenHeight))
-      }
-
-      pipeDistanceXpadding += 100
-      pipeWidthPadding += 100
+    for (i in 0..10) {
+      addPipe()
     }
   }
 
@@ -76,7 +70,7 @@ class PipeDream(context: Context, screenHeight: Int) : View(context) {
     canvas?.drawRect(bird, painter)
 
     painter.color = Color.RED
-    pipes.forEach {
+    remainingPipes.forEach {
       canvas?.drawRect(it, painter)
 
       if (bird.intersect(it)) {
@@ -104,10 +98,21 @@ class PipeDream(context: Context, screenHeight: Int) : View(context) {
       updateBird(bird.top)
     }
 
-    pipes.forEach {
-      it.right -= 5
-      it.left -= 5
+    val iter = pipes.iterator()
+
+    for (pipe in iter) {
+      pipe.right -= 5
+      pipe.left -= 5
+
+      if (pipe.left < 0) {
+        iter.remove()
+        addPipeToRemaining()
+      }
     }
+
+    remainingPipes.addAll(pipes)
+
+    Timber.d("Pipes array size ${pipes.size}")
 
     invalidate()
   }
@@ -116,6 +121,40 @@ class PipeDream(context: Context, screenHeight: Int) : View(context) {
     bird.top = y
     bird.bottom = bird.top + birdHeight
   }
+
+  fun addPipe() {
+    if (createBottomPipe)
+      pipes.add(createBottomPipe(randomPipeHeight()))
+    else
+      pipes.add(createTopPipe(randomPipeHeight()))
+
+    createBottomPipe = !createBottomPipe
+
+    pipeDistanceXpadding += 100
+    pipeWidthPadding += 100
+  }
+
+  fun addPipeToRemaining() {
+    if (createBottomPipe)
+      remainingPipes.add(createBottomPipe(randomPipeHeight()))
+    else
+      remainingPipes.add(createTopPipe(randomPipeHeight()))
+
+    createBottomPipe = !createBottomPipe
+
+    pipeDistanceXpadding += 100
+    pipeWidthPadding += 100
+  }
+
+  fun createTopPipe(pipeHeight: Int) = Rect(pipeLeftMargin + pipeDistanceXpadding, pipeTopMargin,
+      pipeWidth + pipeWidthPadding,
+      pipeHeight)
+
+  fun createBottomPipe(pipeHeight: Int) = Rect(pipeLeftMargin + pipeDistanceXpadding,
+      screenHeight - pipeHeight,
+      pipeWidth + pipeWidthPadding, screenHeight)
+
+  fun randomPipeHeight() = Random().nextInt(200 - 100) + 100
 
   fun startJump() {
     velocityY = -15
