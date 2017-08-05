@@ -12,12 +12,14 @@ import java.util.*
 
 class PipeDream(context: Context, mainContentView: RelativeLayout) : View(context) {
 
-  val painter: Paint
-  val strokeWidth = 10f
+  val painter: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    strokeWidth = 10f
+    style = Paint.Style.FILL
+  }
 
-  var pipes: MutableList<Rect>
+  var pipes: MutableList<Rect> = ArrayList()
 
-  val screenHeight: Int
+  val screenHeight: Int = mainContentView.height
 
   var createBottomPipe = false
   var lastTime: Long = 0
@@ -29,7 +31,7 @@ class PipeDream(context: Context, mainContentView: RelativeLayout) : View(contex
   val pipeLeftMargin = 500
   var pipeWidthPadding = 0
   var pipeDistanceXpadding = 0
-  val pipeWidth = 520
+  val pipeWidth = 560
 
   val birdLeftMargin = 50
   val birdHeight = 50
@@ -38,20 +40,7 @@ class PipeDream(context: Context, mainContentView: RelativeLayout) : View(contex
   var velocityY = 0
   var gravity = 1
 
-  /**
-   * Equivalent of a property initializer for all properties that are mentioned within
-   */
   init {
-    setWillNotDraw(false)
-
-    painter = Paint(Paint.ANTI_ALIAS_FLAG)
-    painter.strokeWidth = strokeWidth
-    painter.style = Paint.Style.FILL
-
-    pipes = ArrayList()
-
-    this.screenHeight = mainContentView.height
-
     bird = Rect(birdLeftMargin, screenHeight / 3, birdWidth,
         (screenHeight / 3) + birdHeight)
   }
@@ -92,9 +81,7 @@ class PipeDream(context: Context, mainContentView: RelativeLayout) : View(contex
       pipe.right -= 5
       pipe.left -= 5
 
-      /**
-       * Slammed into pipe, hit the ground or the ceiling
-       */
+      //Slammed into pipe, hit the ground or the ceiling
       if (bird.intersect(
           pipe) or ((bird.top + birdHeight) == screenHeight) or (bird.bottom < 0)) {
         (context as MainActivity).stopGameLoop()

@@ -14,23 +14,24 @@ class MainActivity : AppCompatActivity() {
   var score: Int = 0
   var highScore: Int = 0
 
+  val highScorePrefsKey = "HIGH_SCORE"
+
   lateinit var pipeDream: PipeDream
   var gameStarted = false
   var timer = Timer()
 
-  lateinit var prefs: SharedPreferences
+  val prefs: SharedPreferences
 
-  /**
-   * TODO: Detect collision with ceiling and floor as a loss
-   */
+  init {
+    prefs = PreferenceManager.getDefaultSharedPreferences(this)
+
+    highScore = prefs.getInt(highScorePrefsKey, 0)
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
 
-    prefs = PreferenceManager.getDefaultSharedPreferences(this)
-
-    highScore = prefs.getInt("HIGH_SCORE", 0)
     highScoreTV.text = highScore.toString()
 
     mainContentView.post({
@@ -101,7 +102,7 @@ class MainActivity : AppCompatActivity() {
 
     if (score > highScore) {
       highScore = score
-      prefs.edit().putInt("HIGH_SCORE", highScore).apply()
+      prefs.edit().putInt(highScorePrefsKey, highScore).apply()
 
       highScoreTV.text = Integer.parseInt(scoreTV.text.toString()).toString()
     }
