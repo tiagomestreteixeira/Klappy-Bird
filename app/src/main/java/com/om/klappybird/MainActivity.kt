@@ -20,18 +20,15 @@ class MainActivity : AppCompatActivity() {
   var gameStarted = false
   var timer = Timer()
 
-  val prefs: SharedPreferences
-
-  init {
-    prefs = PreferenceManager.getDefaultSharedPreferences(this)
-
-    highScore = prefs.getInt(highScorePrefsKey, 0)
-  }
+  lateinit var prefs: SharedPreferences
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
 
+    prefs = PreferenceManager.getDefaultSharedPreferences(this)
+
+    highScore = prefs.getInt(highScorePrefsKey, 0)
     highScoreTV.text = highScore.toString()
 
     mainContentView.post({
