@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.view.View
 import android.widget.RelativeLayout
+import timber.log.Timber
 import java.security.SecureRandom
 import java.util.*
 
@@ -93,8 +94,9 @@ class PipeDream(context: Context, mainContentView: RelativeLayout) : View(contex
         (context as MainActivity).incrementScore()
       }
 
-      if (pipe.left < 0) {
+      if (pipe.left < -60) {
         iter.remove()
+        Timber.d("Pipe removed")
       }
     }
 
