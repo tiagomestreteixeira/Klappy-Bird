@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
     highScoreTV.text = highScore.toString()
 
     mainContentView.post({
-      pipeDream = PipeDream(this, mainContentView.height)
+      pipeDream = PipeDream(this, mainContentView)
 
       mainContentView.addView(pipeDream)
 
@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity() {
             { dialog, which ->
 
               timer = Timer()
-              pipeDream = PipeDream(this, mainContentView.height)
+              pipeDream = PipeDream(this, mainContentView)
               mainContentView.removeAllViews()
               mainContentView.addView(pipeDream)
               scoreTV.text = "0"

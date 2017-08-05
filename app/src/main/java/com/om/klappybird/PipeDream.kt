@@ -1,24 +1,28 @@
 package com.om.klappybird
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Rect
 import android.view.View
-import timber.log.Timber
+import android.widget.RelativeLayout
+import java.security.SecureRandom
 import java.util.*
 
-class PipeDream(context: Context, screenHeight: Int) : View(context) {
+class PipeDream(context: Context, mainContentView: RelativeLayout) : View(context) {
 
   val painter: Paint
   val strokeWidth = 10f
 
   var pipes: MutableList<Rect>
-  var remainingPipes: MutableList<Rect>
-
-  val drawingTimer: Timer
 
   val screenHeight: Int
+  val screenWidth: Int
 
   var createBottomPipe = false
+  var lastTime: Long = 0
+  var elapsedTime: Long = 0
 
   val bird: Rect
 
@@ -27,7 +31,6 @@ class PipeDream(context: Context, screenHeight: Int) : View(context) {
   var pipeWidthPadding = 0
   var pipeDistanceXpadding = 0
   val pipeWidth = 520
-  var pipeHeight = 300
 
   val birdLeftMargin = 50
   val birdHeight = 50
@@ -46,18 +49,13 @@ class PipeDream(context: Context, screenHeight: Int) : View(context) {
     painter.strokeWidth = strokeWidth
     painter.style = Paint.Style.FILL
 
-    drawingTimer = Timer()
     pipes = ArrayList()
-    remainingPipes = ArrayList()
 
-    this.screenHeight = screenHeight
+    this.screenHeight = mainContentView.height
+    this.screenWidth = mainContentView.width
 
     bird = Rect(birdLeftMargin, screenHeight / 3, birdWidth,
         (screenHeight / 3) + birdHeight)
-
-    for (i in 0..10) {
-      addPipe()
-    }
   }
 
   override fun onLayout(p0: Boolean, p1: Int, p2: Int, p3: Int, p4: Int) {
@@ -70,17 +68,9 @@ class PipeDream(context: Context, screenHeight: Int) : View(context) {
     canvas?.drawRect(bird, painter)
 
     painter.color = Color.RED
-    remainingPipes.forEach {
+
+    pipes.forEach {
       canvas?.drawRect(it, painter)
-
-      if (bird.intersect(it)) {
-        canvas?.drawColor(Color.WHITE, PorterDuff.Mode.MULTIPLY)
-        (context as MainActivity).stopGameLoop()
-      }
-
-      if (bird.left == it.left) {
-        (context as MainActivity).incrementScore()
-      }
     }
   }
 
@@ -104,15 +94,33 @@ class PipeDream(context: Context, screenHeight: Int) : View(context) {
       pipe.right -= 5
       pipe.left -= 5
 
+      /**
+       * Slammed into pipe, hit the ground or the ceiling
+       */
+      if (bird.intersect(
+          pipe) or ((bird.top + birdHeight) == screenHeight) or (bird.bottom < 0)) {
+        (context as MainActivity).stopGameLoop()
+        break
+      }
+
+      //Flew over pipe successfully
+      if (bird.left == pipe.left) {
+        (context as MainActivity).incrementScore()
+      }
+
       if (pipe.left < 0) {
         iter.remove()
-        addPipeToRemaining()
       }
     }
 
-    remainingPipes.addAll(pipes)
+    val now = System.currentTimeMillis()
+    elapsedTime += now.minus(lastTime)
+    lastTime = now
 
-    Timber.d("Pipes array size ${pipes.size}")
+    if (elapsedTime > 300) {
+      addPipe()
+      elapsedTime = 0
+    }
 
     invalidate()
   }
@@ -130,20 +138,8 @@ class PipeDream(context: Context, screenHeight: Int) : View(context) {
 
     createBottomPipe = !createBottomPipe
 
-    pipeDistanceXpadding += 100
-    pipeWidthPadding += 100
-  }
-
-  fun addPipeToRemaining() {
-    if (createBottomPipe)
-      remainingPipes.add(createBottomPipe(randomPipeHeight()))
-    else
-      remainingPipes.add(createTopPipe(randomPipeHeight()))
-
-    createBottomPipe = !createBottomPipe
-
-    pipeDistanceXpadding += 100
-    pipeWidthPadding += 100
+    pipeDistanceXpadding += 150
+    pipeWidthPadding += 150
   }
 
   fun createTopPipe(pipeHeight: Int) = Rect(pipeLeftMargin + pipeDistanceXpadding, pipeTopMargin,
@@ -154,7 +150,7 @@ class PipeDream(context: Context, screenHeight: Int) : View(context) {
       screenHeight - pipeHeight,
       pipeWidth + pipeWidthPadding, screenHeight)
 
-  fun randomPipeHeight() = Random().nextInt(200 - 100) + 100
+  fun randomPipeHeight() = SecureRandom().nextInt(500 - 100) + 100
 
   fun startJump() {
     velocityY = -15
