@@ -18,7 +18,6 @@ class PipeDream(context: Context, mainContentView: RelativeLayout) : View(contex
   var pipes: MutableList<Rect>
 
   val screenHeight: Int
-  val screenWidth: Int
 
   var createBottomPipe = false
   var lastTime: Long = 0
@@ -52,7 +51,6 @@ class PipeDream(context: Context, mainContentView: RelativeLayout) : View(contex
     pipes = ArrayList()
 
     this.screenHeight = mainContentView.height
-    this.screenWidth = mainContentView.width
 
     bird = Rect(birdLeftMargin, screenHeight / 3, birdWidth,
         (screenHeight / 3) + birdHeight)
