@@ -118,10 +118,11 @@ class PipeDream(context: Context, mainContentView: RelativeLayout) : View(contex
   }
 
   fun addPipe() {
-    if (createBottomPipe)
+    if (createBottomPipe) {
       pipes.add(createBottomPipe(randomPipeHeight()))
-    else
+    } else {
       pipes.add(createTopPipe(randomPipeHeight()))
+    }
 
     createBottomPipe = !createBottomPipe
 
@@ -137,7 +138,7 @@ class PipeDream(context: Context, mainContentView: RelativeLayout) : View(contex
       screenHeight - pipeHeight,
       pipeWidth + pipeWidthPadding, screenHeight)
 
-  fun randomPipeHeight() = SecureRandom().nextInt(500 - 100) + 100
+  fun randomPipeHeight() = SecureRandom().nextInt(500 - 150) + 150
 
   fun startJump() {
     velocityY = -15
