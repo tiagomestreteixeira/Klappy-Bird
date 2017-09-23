@@ -11,16 +11,16 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-  var score: Int = 0
-  var highScore: Int = 0
+  private var score: Int = 0
+  private var highScore: Int = 0
 
-  val highScorePrefsKey = "HIGH_SCORE"
+  private val highScorePrefsKey = "HIGH_SCORE"
 
   lateinit var pipeDream: PipeDream
-  var gameStarted = false
-  var timer = Timer()
+  private var gameStarted = false
+  private var timer = Timer()
 
-  lateinit var prefs: SharedPreferences
+  private lateinit var prefs: SharedPreferences
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
     timer.cancel()
   }
 
-  fun startGameLoop() {
+  private fun startGameLoop() {
     val doAsynchronousTask = object : TimerTask() {
       override fun run() {
         runOnUiThread {

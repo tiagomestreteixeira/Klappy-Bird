@@ -13,30 +13,30 @@ import java.util.*
 
 class PipeDream(context: Context, mainContentView: RelativeLayout) : View(context) {
 
-  val painter: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+  private val painter: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
     strokeWidth = 10f
     style = Paint.Style.FILL
   }
 
-  var pipes: MutableList<Rect> = ArrayList()
+  private val screenHeight: Int = mainContentView.height
+  private val bird: Rect
+  private val pipeTopMargin = 0
+  private val pipeLeftMargin = 500
+  private val pipeWidth = 560
+  private val birdLeftMargin = 50
+  private val birdHeight = 50
+  private val birdWidth = 100
 
-  val screenHeight: Int = mainContentView.height
+  private var pipes: MutableList<Rect> = ArrayList()
 
-  var createBottomPipe = false
-  var lastTime: Long = 0
-  var elapsedTime: Long = 0
 
-  val bird: Rect
+  private var createBottomPipe = false
+  private var lastTime: Long = 0
+  private var elapsedTime: Long = 0
 
-  val pipeTopMargin = 0
-  val pipeLeftMargin = 500
   var pipeWidthPadding = 0
   var pipeDistanceXpadding = 0
-  val pipeWidth = 560
 
-  val birdLeftMargin = 50
-  val birdHeight = 50
-  val birdWidth = 100
 
   var velocityY = 0
   var gravity = 1
@@ -66,7 +66,7 @@ class PipeDream(context: Context, mainContentView: RelativeLayout) : View(contex
     render()
   }
 
-  fun render() {
+  private fun render() {
     velocityY += gravity
     bird.top += velocityY
 
@@ -112,12 +112,12 @@ class PipeDream(context: Context, mainContentView: RelativeLayout) : View(contex
     invalidate()
   }
 
-  fun updateBird(y: Int) {
+  private fun updateBird(y: Int) {
     bird.top = y
     bird.bottom = bird.top + birdHeight
   }
 
-  fun addPipe() {
+  private fun addPipe() {
     if (createBottomPipe) {
       pipes.add(createBottomPipe(randomPipeHeight()))
     } else {
@@ -130,15 +130,16 @@ class PipeDream(context: Context, mainContentView: RelativeLayout) : View(contex
     pipeWidthPadding += 150
   }
 
-  fun createTopPipe(pipeHeight: Int) = Rect(pipeLeftMargin + pipeDistanceXpadding, pipeTopMargin,
+  private fun createTopPipe(pipeHeight: Int) = Rect(pipeLeftMargin + pipeDistanceXpadding,
+      pipeTopMargin,
       pipeWidth + pipeWidthPadding,
       pipeHeight)
 
-  fun createBottomPipe(pipeHeight: Int) = Rect(pipeLeftMargin + pipeDistanceXpadding,
+  private fun createBottomPipe(pipeHeight: Int) = Rect(pipeLeftMargin + pipeDistanceXpadding,
       screenHeight - pipeHeight,
       pipeWidth + pipeWidthPadding, screenHeight)
 
-  fun randomPipeHeight() = SecureRandom().nextInt(500 - 150) + 150
+  private fun randomPipeHeight() = SecureRandom().nextInt(500 - 150) + 150
 
   fun startJump() {
     velocityY = -15
