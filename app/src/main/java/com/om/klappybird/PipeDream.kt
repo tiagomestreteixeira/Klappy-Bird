@@ -96,7 +96,6 @@ class PipeDream(context: Context, mainContentView: RelativeLayout) : View(contex
 
       if (pipe.left < -60) {
         iter.remove()
-        Timber.d("Pipe removed")
       }
     }
 
